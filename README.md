@@ -4,6 +4,8 @@
 
 A brownfield React + Node.js task-management app demonstrating a full AI-assisted SDLC powered by **CodeMie** (EPAM's enterprise AI platform). Ten specialised agents cover every phase from BA analysis through deployment, all with Human-in-the-Loop checkpoints.
 
+For a full end-to-end operating guide, see [docs/PROJECT_AGENT_PLAYBOOK.md](docs/PROJECT_AGENT_PLAYBOOK.md).
+
 ---
 
 ## What is CodeMie?
