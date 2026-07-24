@@ -6,9 +6,11 @@
     "install:all": "cd frontend && npm install && cd ../backend && npm install && cd ../tests && npm install",
     "dev": "concurrently \"cd backend && npm run dev\" \"cd frontend && npm run dev\"",
     "build": "cd backend && npm run build && cd ../frontend && npm run build",
-    "test": "cd tests && npx playwright test",
+    "test": "cd frontend && npm run test && cd ../tests && npx playwright test",
     "test:report": "cd tests && npx playwright show-report",
-    "sdlc": "npm run build && npm run test"
+    "sdlc": "npm run build && npm run test",
+    "test:unit": "cd frontend && npm run test",
+    "test:e2e": "cd tests && npx playwright test"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"

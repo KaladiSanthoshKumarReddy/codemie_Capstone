@@ -19,10 +19,20 @@ export default function ItemCard({ item, onDelete, onUpdate }: Props) {
   const [busy, setBusy]           = useState(false)
 
   async function handleToggle() {
+    if (item.status === 'archived') return
     setBusy(true)
     try {
       const next = item.status === 'completed' ? 'active' : 'completed'
       await onUpdate(item.id, { status: next })
+    } catch {
+      setBusy(false)
+    }
+  }
+
+  async function handleArchive() {
+    setBusy(true)
+    try {
+      await onUpdate(item.id, { status: 'archived' })
     } catch {
       setBusy(false)
     }
@@ -59,7 +69,7 @@ export default function ItemCard({ item, onDelete, onUpdate }: Props) {
         type="checkbox"
         checked={item.status === 'completed'}
         onChange={handleToggle}
-        disabled={busy}
+        disabled={busy || item.status === 'archived'}
         className="mt-1 h-4 w-4 rounded accent-green-500 cursor-pointer"
         data-testid={`item-toggle-${item.id}`}
         title="Toggle complete"
@@ -105,6 +115,19 @@ export default function ItemCard({ item, onDelete, onUpdate }: Props) {
         data-testid={`item-status-${item.id}`}>
         {item.status}
       </span>
+
+      {/* Archive button — only for non-archived items */}
+      {item.status !== 'archived' && (
+        <button
+          onClick={handleArchive}
+          disabled={busy}
+          className="text-gray-300 hover:text-yellow-500 transition-colors text-xs leading-none disabled:opacity-40"
+          data-testid={`item-archive-${item.id}`}
+          title="Archive item"
+        >
+          Archive
+        </button>
+      )}
 
       {/* Delete */}
       <button

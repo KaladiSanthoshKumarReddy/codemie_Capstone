@@ -158,3 +158,87 @@ test.describe('Pagination', () => {
     }
   })
 })
+
+test.describe('Archive Status', () => {
+  test.beforeEach(async ({ page }) => {
+    await ensureUser(page)
+    const login = new LoginPage(page)
+    await login.goto()
+    await login.login(USER.email, USER.password)
+    await page.waitForURL('**/dashboard')
+  })
+
+  test('clicking Archive button changes status badge to "archived"', async ({ page }) => {
+    const titleInput = page.getByTestId('item-title-input')
+    const addBtn     = page.getByTestId('add-item-button')
+    const title = `Archive Me ${Date.now()}`
+
+    await titleInput.fill(title)
+    await addBtn.click()
+    await expect(page.getByText(title)).toBeVisible()
+
+    // Resolve the item id from the title element's data-testid
+    const titleEl = page.locator('[data-testid^="item-title-"]').filter({ hasText: title }).first()
+    const titleTestId = await titleEl.getAttribute('data-testid')
+    const id = titleTestId?.replace('item-title-', '')
+    expect(id).toBeTruthy()
+
+    // Click the Archive button
+    const archiveBtn = page.locator(`[data-testid="item-archive-${id}"]`)
+    await expect(archiveBtn).toBeVisible()
+    await archiveBtn.click()
+
+    // Status badge should now read 'archived'
+    await expect(page.locator(`[data-testid="item-status-${id}"]`)).toHaveText('archived')
+  })
+
+  test('Archive button is hidden after item is archived', async ({ page }) => {
+    const titleInput = page.getByTestId('item-title-input')
+    const addBtn     = page.getByTestId('add-item-button')
+    const title = `Hide Archive Btn ${Date.now()}`
+
+    await titleInput.fill(title)
+    await addBtn.click()
+    await expect(page.getByText(title)).toBeVisible()
+
+    const titleEl = page.locator('[data-testid^="item-title-"]').filter({ hasText: title }).first()
+    const titleTestId = await titleEl.getAttribute('data-testid')
+    const id = titleTestId?.replace('item-title-', '')
+    expect(id).toBeTruthy()
+
+    const archiveBtn = page.locator(`[data-testid="item-archive-${id}"]`)
+    await archiveBtn.click()
+    await expect(page.locator(`[data-testid="item-status-${id}"]`)).toHaveText('archived')
+
+    // Archive button should no longer be in the DOM for an archived item
+    await expect(archiveBtn).not.toBeVisible()
+  })
+
+  test('archived item appears when filtering by Archived status', async ({ page }) => {
+    const titleInput = page.getByTestId('item-title-input')
+    const addBtn     = page.getByTestId('add-item-button')
+    const title = `Filter Archive ${Date.now()}`
+
+    await titleInput.fill(title)
+    await addBtn.click()
+    await expect(page.getByText(title)).toBeVisible()
+
+    // Archive the item
+    const titleEl = page.locator('[data-testid^="item-title-"]').filter({ hasText: title }).first()
+    const titleTestId = await titleEl.getAttribute('data-testid')
+    const id = titleTestId?.replace('item-title-', '')
+    expect(id).toBeTruthy()
+
+    const archiveBtn = page.locator(`[data-testid="item-archive-${id}"]`)
+    await archiveBtn.click()
+    await expect(page.locator(`[data-testid="item-status-${id}"]`)).toHaveText('archived')
+
+    // Select "Archived" from the status filter
+    const filter = page.getByTestId('status-filter')
+    await filter.selectOption('archived')
+    await expect(page).toHaveURL(/status=archived/)
+
+    // The archived item should be visible in the filtered list
+    await expect(page.getByText(title)).toBeVisible()
+  })
+})
