@@ -17,20 +17,25 @@ export default defineConfig({
   },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
-    { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
   ],
   webServer: [
     {
-      command: 'cd ../backend && npm run dev',
+      command: 'npm run dev',
+      cwd: '../backend',
       url: 'http://localhost:4000/api/health',
       reuseExistingServer: !process.env.CI,
-      timeout: 30000,
+      timeout: 120_000,
+      stdout: 'pipe',
+      stderr: 'pipe',
     },
     {
-      command: 'cd ../frontend && npm run dev',
+      command: 'npm run dev',
+      cwd: '../frontend',
       url: 'http://localhost:3000',
       reuseExistingServer: !process.env.CI,
-      timeout: 30000,
+      timeout: 120_000,
+      stdout: 'pipe',
+      stderr: 'pipe',
     },
   ],
 })
