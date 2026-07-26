@@ -24,28 +24,22 @@ CodeMie is EPAM's AI development platform that runs Claude Code in a governed, e
 - Git:        https://github.com/KaladiSanthoshKumarReddy/capstone (branch: main)
 - CodeMie:    workspace bound via `.vscode/settings.json`
 
-## All Agents (in .claude/agents/)
+## Agents (in .claude/agents/)
 
-### SDLC Pipeline Agents
 | Agent | Role | When to use |
 |-------|------|-------------|
-| ba-agent | BA — writes Jira epics/stories | "analyze requirements", "create epic", "user story" |
-| architect-agent | Creates HLD/LLD, pushes to Confluence | "architecture", "HLD", "LLD", "design phase" |
-| dev-agent | Generates React + Node.js code, commits | "generate code", "implement feature", "build" |
-| qa-agent | Writes Gherkin + Playwright TS tests | "write tests", "gherkin", "playwright", "E2E" |
-| review-agent | Code reviews PRs, posts comments | "code review", "review PR", "check code" |
-| docs-agent | Updates Confluence FRD/design docs | "documentation", "FRD", "update docs" |
-
-### CodeMie Quality Agents
-| Agent | Role | When to use |
-|-------|------|-------------|
-| unit-tester-agent | Writes Playwright/Vitest unit & integration tests | "unit test", "test coverage", "write test" |
-| solution-architect-agent | Reviews architecture, identifies tech debt | "architecture review", "design decision", "tech debt" |
-| code-review-agent | Reviews TypeScript quality, security, linting | "code quality", "lint", "review code" |
-| refactor-cleaner-agent | Removes dead code and unused dependencies | "refactor", "cleanup", "dead code", "unused" |
+| ba-agent | Requirements, epics, user stories, Jira | "analyze requirements", "create epic", "user story", "identify gaps" |
+| architect-agent | HLD/LLD, ADRs, tech debt, Confluence | "architecture", "HLD", "LLD", "design phase", "tech debt", "ADR" |
+| dev-agent | React + Node.js code, Git commits, refactoring | "generate code", "implement feature", "build", "refactor", "cleanup" |
+| qa-agent | Playwright E2E, Vitest unit tests, Gherkin | "write tests", "gherkin", "playwright", "E2E", "unit test", "vitest" |
+| review-agent | TypeScript quality, security audit, PR review | "code review", "review PR", "security audit", "lint", "code quality" |
+| docs-agent | Confluence pages, FRD, README, API docs | "documentation", "FRD", "update docs", "confluence page" |
 
 ## Commands
 ```bash
+# Install all dependencies
+npm run install:all
+
 # Start frontend dev server
 cd frontend && npm run dev
 
@@ -55,8 +49,9 @@ cd backend && npm run dev
 # Run E2E tests
 cd tests && npx playwright test
 
-# Run all (full SDLC demo)
-npm run sdlc
+# Run unit tests
+cd frontend && npx vitest run
+cd backend && npx vitest run
 ```
 
 ## Environment

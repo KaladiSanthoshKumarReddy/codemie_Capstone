@@ -1,23 +1,56 @@
 # Capstone-CodeMie — AI-Driven SDLC via CodeMie
 
-> **Group:** mm-learning-group-1 | **Project:** EPMCDMETST | **Branch:** `main`
+> **Group:** mm-learning-group-1 | **Jira Project:** EPMCDMETST | **Branch:** `main`
 
-A brownfield React + Node.js task-management app demonstrating a full AI-assisted SDLC powered by **CodeMie** (EPAM's enterprise AI platform). Ten specialised agents cover every phase from BA analysis through deployment, all with Human-in-the-Loop checkpoints.
+A brownfield React + Node.js task-management app demonstrating a full AI-assisted SDLC pipeline powered by **CodeMie** (EPAM's enterprise AI platform). Six specialised agents — each embodying a SDLC persona — drive every phase from requirements to deployment, with **Human-in-the-Loop (HITL)** checkpoints at every gate.
 
-For a full end-to-end operating guide, see [docs/PROJECT_AGENT_PLAYBOOK.md](docs/PROJECT_AGENT_PLAYBOOK.md).
+---
+
+## Table of Contents
+
+1. [What is CodeMie?](#what-is-codemie)
+2. [Capstone Objective](#capstone-objective)
+3. [Tech Stack](#tech-stack)
+4. [Quick Start](#quick-start)
+5. [The 6 SDLC Agents](#the-6-sdlc-agents)
+6. [SDLC Pipeline — Step by Step](#sdlc-pipeline--step-by-step)
+7. [Example End-to-End Walkthrough](#example-end-to-end-walkthrough)
+8. [How to Invoke Agents](#how-to-invoke-agents)
+9. [Project Structure](#project-structure)
+10. [API Reference](#api-reference)
+11. [Environment Variables](#environment-variables)
+12. [Testing](#testing)
+13. [Integrations](#integrations)
+14. [Troubleshooting](#troubleshooting)
 
 ---
 
 ## What is CodeMie?
 
-[CodeMie](https://codemie.epam.com) is EPAM's enterprise AI development platform built on top of Claude Code. It provides:
+[CodeMie](https://codemie.epam.com) is EPAM's enterprise AI development platform built on Claude Code. It provides:
 
 - **Governed access** to AI models under EPAM's security and compliance policies
-- **Workspace binding** — your project is registered in the platform via a Workspace ID
-- **Agent discovery** — any `.md` file in `.claude/agents/` is automatically surfaced in the CodeMie IDE sidebar
-- **Audit trails** — all AI interactions are logged centrally
+- **Workspace binding** — your project is registered via a Workspace ID in `.vscode/settings.json`
+- **Agent auto-discovery** — any `.md` file in `.claude/agents/` is surfaced automatically in the IDE sidebar
+- **Audit trails** — all AI interactions are logged centrally for governance
 
-This project is pre-configured with a `workspaceId` in `.vscode/settings.json`. Just open the folder in VS Code with the CodeMie extension and all 10 agents appear immediately.
+This project is pre-configured. Open the folder in VS Code with the CodeMie extension and all 6 agents appear immediately.
+
+---
+
+## Capstone Objective
+
+Build an **agentic SDLC pipeline** where every phase is powered by a dedicated AI assistant persona, integrated with enterprise tooling (Jira, Confluence, GitHub), with human review gates after each phase.
+
+| Deliverable | Agent | Tool |
+|-------------|-------|------|
+| Gaps / Enhancements identified | `ba-agent` | Jira |
+| User Stories generated | `ba-agent` | Jira |
+| Architecture & Design created | `architect-agent` | Confluence |
+| Code implemented & committed | `dev-agent` | Git / GitHub |
+| Code reviewed | `review-agent` | GitHub PRs |
+| Tests written & validated | `qa-agent` | Playwright + Vitest |
+| Documentation updated | `docs-agent` | Confluence + README |
 
 ---
 
@@ -26,12 +59,13 @@ This project is pre-configured with a `workspaceId` in `.vscode/settings.json`. 
 | Layer | Technology |
 |-------|-----------|
 | Frontend | React 18 + TypeScript + Vite + Tailwind CSS |
-| State | Zustand (auth), React Router v6 (URL-synced filters) |
-| Backend | Node.js + Express + TypeScript |
+| State | Zustand (auth) + React Router v6 |
+| Backend | Node.js 20 + Express + TypeScript |
 | Database | SQLite via `better-sqlite3` |
-| Auth | JWT (HS256, 8h expiry) + SHA-256 password hash |
-| Validation | Zod (backend), HTML5 + React (frontend) |
+| Auth | JWT HS256 (8 h expiry) + SHA-256 password hash |
+| Validation | Zod (backend) + HTML5 (frontend) |
 | E2E Testing | Playwright TypeScript (POM pattern) |
+| Unit Testing | Vitest |
 | CI | GitHub Actions |
 
 ---
@@ -40,12 +74,12 @@ This project is pre-configured with a `workspaceId` in `.vscode/settings.json`. 
 
 ### Prerequisites
 
-| Tool | Minimum Version |
-|------|----------------|
+| Tool | Version |
+|------|---------|
 | Node.js | 20+ |
 | npm | 10+ |
-| VS Code | latest |
-| CodeMie VS Code Extension | installed and signed in |
+| VS Code | Latest |
+| CodeMie VS Code Extension | Installed + signed in |
 | Git | 2.x+ |
 
 ### 1 — Clone and install
@@ -60,254 +94,338 @@ npm run install:all
 
 ```bash
 cp .env.example .env
-# Edit .env and fill in your tokens
+# Edit .env with your tokens (see Environment Variables section)
 ```
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `BACKEND_PORT` | `4000` | Express server port |
-| `FRONTEND_PORT` | `3000` | Vite dev server port |
-| `DATABASE_PATH` | `./data/capstone.db` | SQLite file path |
-| `JWT_SECRET` | *(set this!)* | Token signing secret |
-| `JIRA_BASE_URL` | `https://jiraeu.epam.com` | Jira instance URL |
-| `JIRA_API_TOKEN` | — | EPAM Jira Personal Access Token |
-| `CONFLUENCE_BASE_URL` | `https://kb.epam.com` | Confluence instance URL |
-| `CONFLUENCE_API_TOKEN` | — | EPAM Confluence Personal Access Token |
-| `CONFLUENCE_SPACE_KEY` | — | Your Confluence space key |
-| `GITHUB_TOKEN` | — | GitHub PAT with `repo` scope |
 
 ### 3 — Run in development
 
 ```bash
-npm run dev
-# Backend  → http://localhost:4000
-# Frontend → http://localhost:3000
+# Terminal 1 — backend
+cd backend && npm run dev   # → http://localhost:4000
+
+# Terminal 2 — frontend
+cd frontend && npm run dev  # → http://localhost:3000
 ```
 
-### 4 — Run E2E tests
+### 4 — Run tests
 
 ```bash
-cd tests
-npx playwright test
-npx playwright show-report   # open HTML report
+# E2E tests
+cd tests && npx playwright test
+
+# Unit tests
+cd frontend && npx vitest run
+cd backend && npx vitest run
 ```
 
 ---
 
-## How to Use Agents in CodeMie
+## The 6 SDLC Agents
+
+All agents live in `.claude/agents/` and are auto-discovered by CodeMie. Each agent covers its primary SDLC role **plus** the related quality capabilities (no separate quality agents needed).
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                         SDLC AGENTS                                  │
+│                                                                      │
+│  ┌──────────┐  ┌────────────┐  ┌──────────┐  ┌───────────────────┐ │
+│  │ ba-agent │→ │architect-  │→ │dev-agent │→ │    qa-agent       │ │
+│  │          │  │   agent    │  │          │  │                   │ │
+│  │ Analysis │  │ Design +   │  │ Code +   │  │ E2E + Unit Tests  │ │
+│  │ + Stories│  │ ADRs + TD  │  │ Refactor │  │ + Gherkin BDD     │ │
+│  └──────────┘  └────────────┘  └──────────┘  └───────────────────┘ │
+│                                                          ↓           │
+│  ┌──────────────────────────────────────────┐  ┌──────────────────┐ │
+│  │              docs-agent                  │← │  review-agent    │ │
+│  │  Confluence FRD + API Docs + README      │  │ TypeScript +     │ │
+│  │                                          │  │ Security + PR    │ │
+│  └──────────────────────────────────────────┘  └──────────────────┘ │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Agent Capabilities at a Glance
+
+| Agent | Primary Role | Also Covers |
+|-------|-------------|-------------|
+| `ba-agent` | Requirements, Jira epics/stories | Gap analysis, acceptance criteria |
+| `architect-agent` | HLD, LLD, Confluence docs | Architecture review, ADRs, tech debt |
+| `dev-agent` | React + Node.js code, Git commits | Refactoring, dead code cleanup |
+| `qa-agent` | Playwright E2E, Gherkin BDD | Vitest unit + integration tests |
+| `review-agent` | PR code review, GitHub comments | TypeScript audit, security review |
+| `docs-agent` | Confluence pages, FRD, README | API docs (OpenAPI), test reports |
+
+---
+
+## SDLC Pipeline — Step by Step
+
+The capstone SDLC has **8 phases**, each with a HITL checkpoint before proceeding.
+
+```
+┌───────────────────────────────────────────────────────────────────────────┐
+│                    CAPSTONE SDLC PIPELINE                                  │
+│                                                                             │
+│  PHASE 1 ─ Analysis              PHASE 5 ─ Code Review                    │
+│  ┌─────────────────────┐         ┌─────────────────────┐                  │
+│  │  @ba-agent          │         │  @review-agent       │                  │
+│  │  Analyze codebase   │         │  Review PR diff      │                  │
+│  │  Identify 3-5 gaps  │         │  TypeScript + Sec.   │                  │
+│  │  Create Jira Stories│         │  Post to GitHub PR   │                  │
+│  └──────────┬──────────┘         └──────────┬───────────┘                  │
+│             │ ✋ HITL                        │ ✋ HITL                       │
+│             ▼                               ▼                               │
+│  PHASE 2 ─ Design                PHASE 6 ─ Testing                        │
+│  ┌─────────────────────┐         ┌─────────────────────┐                  │
+│  │  @architect-agent   │         │  @qa-agent           │                  │
+│  │  HLD + LLD docs     │         │  Playwright E2E      │                  │
+│  │  Mermaid diagrams   │         │  Vitest unit tests   │                  │
+│  │  Push to Confluence │         │  Gherkin scenarios   │                  │
+│  └──────────┬──────────┘         └──────────┬───────────┘                  │
+│             │ ✋ HITL                        │ ✋ HITL                       │
+│             ▼                               ▼                               │
+│  PHASE 3 ─ Development           PHASE 7 ─ Deployment                     │
+│  ┌─────────────────────┐         ┌─────────────────────┐                  │
+│  │  @dev-agent          │         │  npm run dev         │                  │
+│  │  React components   │         │  Backend + Frontend  │                  │
+│  │  Express endpoints  │         │  Local / CI deploy   │                  │
+│  │  Git commit + push  │         │  GitHub Actions      │                  │
+│  └──────────┬──────────┘         └──────────┬───────────┘                  │
+│             │ ✋ HITL                        │ ✋ HITL                       │
+│             ▼                               ▼                               │
+│  PHASE 4 ─ Plan/PR               PHASE 8 ─ Documentation                  │
+│  ┌─────────────────────┐         ┌─────────────────────┐                  │
+│  │  @dev-agent          │         │  @docs-agent         │                  │
+│  │  Create PR + plan   │         │  Update Confluence   │                  │
+│  │  Link to Jira story │         │  FRD + API docs      │                  │
+│  │  Open for review    │         │  Update README       │                  │
+│  └──────────┬──────────┘         └──────────┬───────────┘                  │
+│             │ ✋ HITL                        │ ✋ HITL                       │
+│             ▼                               ▼                               │
+│                         DONE — Merged to main                               │
+└───────────────────────────────────────────────────────────────────────────┘
+```
+
+### Human-in-the-Loop Checkpoints
+
+Every agent ends its response with a **"Human Review Required"** message. You must review and approve before invoking the next agent.
+
+| Phase | HITL Action Required |
+|-------|---------------------|
+| After Analysis | Review Jira stories, accept/edit criteria before design |
+| After Design | Review Confluence HLD/LLD, approve architecture before coding |
+| After Development | Review git diff, approve code before opening PR |
+| After PR Created | Review PR in GitHub, check it's linked to Jira |
+| After Code Review | Address Critical issues, re-request review if needed |
+| After Testing | Review Playwright report, ensure all tests pass |
+| After Deployment | Smoke test the running app before marking done |
+| After Documentation | Review Confluence pages for accuracy |
+
+---
+
+## Example End-to-End Walkthrough
+
+This example shows adding an **"Item Priority"** feature (High / Medium / Low priority label on each task).
+
+---
+
+### Step 1 — BA Analysis (ba-agent)
+
+**You type:**
+```
+@ba-agent Analyze the current app and identify enhancement opportunities, then create a Jira Epic and Stories in EPMCDMETST
+```
+
+**Agent does:**
+1. Reads `frontend/src/` and `backend/src/` to understand existing features
+2. Identifies gaps: no priority field, no due dates, no notifications, no sorting
+3. Creates Jira Epic: `[Capstone] AI-Driven SDLC Enhancements`
+4. Creates Story: `[Enhancement] Add Item Priority Labels (High/Medium/Low)`
+
+**Agent output:**
+```
+| Story Key        | Summary                          | Status | Link |
+|------------------|----------------------------------|--------|------|
+| EPMCDMETST-55183 | [Epic] AI-Driven Enhancements    | Open   | ...  |
+| EPMCDMETST-55189 | [Enhancement] Item Priority Tags | Open   | ...  |
+
+✋ Human Review Required: Please review the stories above in Jira
+   before I proceed to the design phase.
+```
+
+**You (HITL):** Review stories in Jira. Edit acceptance criteria if needed. Type "Approved, proceed to design" to continue.
+
+---
+
+### Step 2 — Architecture Design (architect-agent)
+
+**You type:**
+```
+@architect-agent Create the HLD and LLD for the Item Priority feature (EPMCDMETST-55189) and push to Confluence
+```
+
+**Agent does:**
+1. Designs React component changes: `PriorityBadge` component with `data-testid`
+2. Designs API changes: adds `priority` field to `POST /items` and `PATCH /items/:id`
+3. Designs DB migration: `ALTER TABLE items ADD COLUMN priority TEXT DEFAULT 'medium'`
+4. Produces Mermaid sequence diagram for the create-with-priority flow
+5. Pushes HLD + LLD pages to Confluence
+
+**Agent output:**
+```
+Architecture documents published:
+- HLD: https://kb.epam.com/pages/viewpage.action?pageId=XXXXXXX
+- LLD: https://kb.epam.com/pages/viewpage.action?pageId=XXXXXXX
+
+✋ Human Review Required: Architecture published to Confluence.
+   Please review before proceeding to development.
+```
+
+**You (HITL):** Open the Confluence links, review diagrams and API contract. Approve or request changes.
+
+---
+
+### Step 3 — Development (dev-agent)
+
+**You type:**
+```
+@dev-agent Implement the Item Priority feature from EPMCDMETST-55189:
+- Add priority field to the Item type
+- Add PriorityBadge component to ItemCard
+- Update POST /items and PATCH /items/:id to accept priority
+- Add SQLite migration for the priority column
+```
+
+**Agent does:**
+1. Adds `priority: 'high' | 'medium' | 'low'` to `frontend/src/types/index.ts`
+2. Creates `frontend/src/components/PriorityBadge.tsx` with `data-testid="priority-badge"`
+3. Updates `backend/src/routes/items.ts` — Zod schema updated with `priority` field
+4. Writes SQLite migration: `ALTER TABLE items ADD COLUMN priority TEXT DEFAULT 'medium'`
+5. Commits: `feat(items): add priority field with badge UI [EPMCDMETST-55189]`
+6. Pushes to `feature/EPMCDMETST-55189-item-priority`
+
+**Agent output:**
+```
+Code committed to branch: feature/EPMCDMETST-55189-item-priority
+Commit: feat(items): add priority field with badge UI [EPMCDMETST-55189]
+
+✋ Human Review Required: Please review the diff at:
+   https://github.com/KaladiSanthoshKumarReddy/capstone/compare/feature/EPMCDMETST-55189-item-priority
+   before I open a PR.
+```
+
+**You (HITL):** Review the git diff. Confirm the implementation matches the LLD. Type "Approved, open the PR."
+
+---
+
+### Step 4 — Code Review (review-agent)
+
+**You type:**
+```
+@review-agent Review the PR for feature/EPMCDMETST-55189-item-priority against main
+```
+
+**Agent does:**
+1. Runs `git diff main...HEAD`
+2. Checks TypeScript strictness, Zod validation, ownership checks
+3. Verifies `data-testid` attributes on new components
+4. Posts review findings to the GitHub PR
+
+**Agent output:**
+```
+| Severity | File                              | Line | Issue                        | Suggestion                        |
+|----------|-----------------------------------|------|------------------------------|-----------------------------------|
+| Warning  | backend/src/routes/items.ts       |  38  | priority not in UPDATE schema| Add priority to PATCH Zod schema  |
+| Info     | frontend/src/components/Badge.tsx |  12  | Missing aria-label on badge  | Add aria-label="item priority"    |
+
+✋ Human Review Required: 0 critical, 1 warning, 1 info found.
+   Please address the warning before merging.
+```
+
+**You (HITL):** Fix the warning, re-request review. Once approved, continue to testing.
+
+---
+
+### Step 5 — Testing (qa-agent)
+
+**You type:**
+```
+@qa-agent Write Playwright E2E tests and Vitest unit tests for the Item Priority feature [EPMCDMETST-55189]
+```
+
+**Agent does:**
+1. Writes `tests/features/item-priority.feature` (Gherkin BDD)
+2. Writes `tests/e2e/pages/ItemPage.ts` — adds `priorityBadge` locator
+3. Writes `tests/e2e/specs/item-priority.spec.ts` — happy + error path
+4. Writes `frontend/src/__tests__/PriorityBadge.test.tsx` — Vitest unit test
+5. Runs all tests and saves HTML report
+
+**Agent output:**
+```
+Gherkin: tests/features/item-priority.feature
+E2E spec: tests/e2e/specs/item-priority.spec.ts  (3 scenarios)
+Unit test: frontend/src/__tests__/PriorityBadge.test.tsx (4 tests)
+
+Test results: 3/3 E2E passed, 4/4 unit passed
+Report: tests/playwright-report/index.html
+
+✋ Human Review Required: All tests pass. Please review the
+   report and confirm before deployment.
+```
+
+**You (HITL):** Open the Playwright HTML report. Confirm all tests green.
+
+---
+
+### Step 6 — Documentation (docs-agent)
+
+**You type:**
+```
+@docs-agent Update the FRD and API Reference in Confluence to include the new priority field, and update README.md
+```
+
+**Agent does:**
+1. Updates FRD Confluence page — adds priority requirement
+2. Updates API Reference page — adds `priority` to POST/PATCH schemas
+3. Updates `README.md` API table
+4. Commits README change
+
+**Agent output:**
+```
+Updated:
+- FRD: https://kb.epam.com/pages/viewpage.action?pageId=2889556181
+- API Docs: https://kb.epam.com/pages/viewpage.action?pageId=2889556182
+- README.md — API table updated
+
+✋ Human Review Required: Documentation updated. Please review
+   Confluence pages for accuracy before closing the story.
+```
+
+**You (HITL):** Open Confluence links. Verify accuracy. Merge the PR to `main`. Close the Jira story.
+
+---
+
+## How to Invoke Agents
 
 ### Method 1 — CodeMie IDE Chat (recommended)
-
 1. Open this folder in VS Code
-2. Click the **CodeMie icon** in the Activity Bar (left sidebar)
-3. Open the **Agents** tab — all 10 agents appear automatically
+2. Click the **CodeMie icon** in the Activity Bar
+3. Open the **Agents** tab — all 6 agents appear automatically
 4. Click an agent or type `@agent-name` in the chat input
 
-### Method 2 — Claude Code CLI (via CodeMie terminal)
-
-```bash
-# In the CodeMie-connected terminal:
-claude                        # opens interactive session
-# Then type: @ba-agent analyze requirements and create Jira stories
-```
-
-### Method 3 — Slash commands in chat
-
-In the CodeMie chat input, type `/` to see available commands, or directly trigger agents:
-
+### Method 2 — Slash Commands in chat
 ```
 /ba-agent        → BA analysis + Jira stories
-/architect-agent → Architecture docs + Confluence
-/dev-agent       → Code implementation + Git commit
-/qa-agent        → Playwright E2E tests
-/review-agent    → Code review + PR comments
-/docs-agent      → Confluence + README docs
+/architect-agent → Architecture + Confluence docs
+/dev-agent       → Code implementation + Git
+/qa-agent        → Playwright E2E + Vitest unit tests
+/review-agent    → Code review + GitHub PR comments
+/docs-agent      → Confluence + README documentation
 ```
 
----
-
-## All Agents
-
-All agents live in `.claude/agents/` and are auto-discovered by CodeMie.
-
-### SDLC Pipeline Agents
-
-These agents drive the full Software Development Lifecycle end-to-end.
-
-#### `ba-agent` — Business Analyst
-**What it does**: Analyzes the codebase, identifies 3–5 enhancements, creates a Jira Epic and linked Stories with acceptance criteria.
-
-**When to use**: Start of any new feature cycle.
-
-**Trigger phrases**: `"analyze requirements"`, `"create epic"`, `"write user story"`, `"identify gaps"`
-
-**Example prompt**:
+### Method 3 — Claude Code CLI (via CodeMie terminal)
+```bash
+claude   # opens interactive session
+# Then type: @ba-agent analyze requirements and create Jira stories
 ```
-@ba-agent Analyze the current frontend and backend and identify gaps, then create Jira stories in EPMCDMETST
-```
-
-**Output**: Jira Epic key + Story keys printed as a table with links.
-
----
-
-#### `architect-agent` — Solution Architect
-**What it does**: Creates Architecture Overview, HLD, LLD documents with Mermaid diagrams and pushes them to Confluence.
-
-**When to use**: After BA stories are approved, before development starts.
-
-**Trigger phrases**: `"architecture"`, `"HLD"`, `"LLD"`, `"design phase"`, `"confluence"`, `"system design"`
-
-**Example prompt**:
-```
-@architect-agent Create the architecture document and HLD for the new notification feature and push to Confluence
-```
-
-**Output**: Confluence page URLs for Architecture + HLD + LLD.
-
----
-
-#### `dev-agent` — Full-Stack Developer
-**What it does**: Implements React TypeScript frontend components + Express TypeScript backend endpoints, runs SQLite migrations, commits to Git.
-
-**When to use**: During development phase after architecture is approved.
-
-**Trigger phrases**: `"generate code"`, `"implement feature"`, `"write component"`, `"create API"`, `"commit code"`
-
-**Example prompt**:
-```
-@dev-agent Implement the notification bell component in the frontend and a GET /api/notifications endpoint [EPMCDMETST-XXXXX]
-```
-
-**Output**: Committed code + branch name for PR.
-
----
-
-#### `qa-agent` — QA Automation Engineer
-**What it does**: Writes Gherkin `.feature` files and Playwright TypeScript E2E specs using the Page Object Model pattern.
-
-**When to use**: After development is complete, before code review.
-
-**Trigger phrases**: `"write tests"`, `"gherkin"`, `"playwright"`, `"E2E"`, `"test cases"`
-
-**Example prompt**:
-```
-@qa-agent Write Playwright E2E tests for the notification feature covering happy path and error scenarios [EPMCDMETST-XXXXX]
-```
-
-**Output**: New `.feature` file + spec file + test execution report.
-
----
-
-#### `review-agent` — Code Reviewer
-**What it does**: Runs `git diff main...HEAD`, checks against project standards (TypeScript, security, testing), posts findings to GitHub PR.
-
-**When to use**: Before merging any feature branch.
-
-**Trigger phrases**: `"code review"`, `"review PR"`, `"check code"`, `"pull request review"`
-
-**Example prompt**:
-```
-@review-agent Review the current branch changes against main
-```
-
-**Output**: Severity table (Critical / Warning / Info) + GitHub PR review comment.
-
----
-
-#### `docs-agent` — Technical Writer
-**What it does**: Maintains Confluence pages (FRD, Architecture, HLD, LLD, Test Results) and Git README/CONTRIBUTING.
-
-**When to use**: End of each SDLC phase; after deployment.
-
-**Trigger phrases**: `"documentation"`, `"confluence page"`, `"FRD"`, `"README"`, `"API docs"`, `"update docs"`
-
-**Example prompt**:
-```
-@docs-agent Update the FRD page in Confluence with the new notification requirements
-```
-
-**Output**: Confluence page URL + updated README.
-
----
-
-### CodeMie Quality Agents
-
-These agents focus on code quality, maintainability, and cleanup — designed to integrate with CodeMie's quality workflows.
-
-#### `unit-tester-agent` — Unit & Integration Test Writer
-**What it does**: Writes Playwright E2E tests and Vitest unit tests following the project's POM pattern and `data-testid` conventions.
-
-**When to use**: Adding test coverage to existing or new code.
-
-**Trigger phrases**: `"unit test"`, `"test coverage"`, `"write test"`, `"integration test"`, `"vitest"`
-
-**Example prompt**:
-```
-@unit-tester-agent Add unit tests for the authStore Zustand store
-```
-
----
-
-#### `solution-architect-agent` — Architecture Reviewer
-**What it does**: Reviews architecture decisions, produces ADRs (Architecture Decision Records), identifies tech debt, estimates effort.
-
-**When to use**: Before major refactors, new integrations, or scaling decisions.
-
-**Trigger phrases**: `"architecture review"`, `"design decision"`, `"tech debt"`, `"scalability"`, `"should I use"`
-
-**Example prompt**:
-```
-@solution-architect-agent Should we add Redis caching to the items API? Give me an ADR.
-```
-
----
-
-#### `code-review-agent` — Code Quality Reviewer
-**What it does**: Reviews TypeScript strictness, security patterns, API shape consistency, React conventions, and testing coverage — outputs a severity table.
-
-**When to use**: Spot-checking code quality; pre-PR review.
-
-**Trigger phrases**: `"code quality"`, `"lint"`, `"review code"`, `"typescript error"`, `"security audit"`
-
-**Example prompt**:
-```
-@code-review-agent Review backend/src/routes/items.ts for security and TypeScript quality
-```
-
----
-
-#### `refactor-cleaner-agent` — Code Cleanup
-**What it does**: Finds and removes dead code, unused imports, redundant dependencies, and code duplication. Always asks for confirmation before deleting.
-
-**When to use**: Periodic codebase cleanup; before releases.
-
-**Trigger phrases**: `"refactor"`, `"cleanup"`, `"dead code"`, `"unused imports"`, `"reduce bundle"`
-
-**Example prompt**:
-```
-@refactor-cleaner-agent Find all unused imports and dead code in the frontend
-```
-
----
-
-## Full SDLC Demo Walkthrough
-
-Run an end-to-end AI-driven SDLC cycle in order:
-
-```
-Step 1:  @ba-agent         → analyze requirements → Jira Epic + Stories
-Step 2:  @architect-agent  → create HLD/LLD       → Confluence pages
-Step 3:  @dev-agent        → implement feature     → Git commit
-Step 4:  @unit-tester-agent → add test coverage   → test files committed
-Step 5:  @qa-agent         → E2E tests             → Playwright report
-Step 6:  @review-agent     → code review           → PR review comment
-Step 7:  @code-review-agent → quality audit        → severity table
-Step 8:  @docs-agent       → update docs           → Confluence + README
-Step 9:  @solution-architect-agent → arch review   → ADR document
-Step 10: @refactor-cleaner-agent   → cleanup        → deletion log
-```
-
-Each agent ends with a **Human Review Required** checkpoint before you proceed.
 
 ---
 
@@ -316,44 +434,54 @@ Each agent ends with a **Human Review Required** checkpoint before you proceed.
 ```
 capstone-codemie/
 ├── .claude/
-│   └── agents/                        ← All 10 agents auto-discovered by CodeMie
-│       ├── ba-agent.md                  SDLC: Business Analyst
-│       ├── architect-agent.md           SDLC: Solution Architect (HLD/LLD)
-│       ├── dev-agent.md                 SDLC: Full-Stack Developer
-│       ├── qa-agent.md                  SDLC: QA / Playwright tests
-│       ├── review-agent.md              SDLC: Code Reviewer
-│       ├── docs-agent.md                SDLC: Technical Writer
-│       ├── unit-tester-agent.md         CodeMie: Unit & Integration Tests
-│       ├── solution-architect-agent.md  CodeMie: Architecture Decisions (ADR)
-│       ├── code-review-agent.md         CodeMie: Code Quality Audit
-│       └── refactor-cleaner-agent.md    CodeMie: Dead Code Cleanup
+│   └── agents/
+│       ├── ba-agent.md          ← Business Analyst: analysis + Jira stories
+│       ├── architect-agent.md   ← Architect: HLD/LLD + ADRs + Confluence
+│       ├── dev-agent.md         ← Developer: React + Node.js + Git + refactor
+│       ├── qa-agent.md          ← QA: Playwright E2E + Vitest + Gherkin
+│       ├── review-agent.md      ← Reviewer: TypeScript + security + PR
+│       └── docs-agent.md        ← Docs: Confluence FRD + API docs + README
+│
 ├── .codemie/
 │   └── guides/
-│       └── project-guide.md           ← Primary context for all agents
+│       └── project-guide.md     ← Primary context for all agents
+│
 ├── .vscode/
-│   └── settings.json                  ← CodeMie workspaceId binding
+│   └── settings.json            ← CodeMie workspaceId binding
+│
 ├── backend/
 │   └── src/
-│       ├── db/init.ts                 ← SQLite schema + init
-│       ├── middleware/auth.ts         ← JWT verify (critical path)
-│       └── routes/auth.ts, items.ts  ← REST API endpoints
+│       ├── db/init.ts            ← SQLite schema + migration runner (critical)
+│       ├── middleware/auth.ts    ← JWT verify middleware (critical)
+│       ├── routes/
+│       │   ├── auth.ts           ← POST /auth/register, /auth/login
+│       │   └── items.ts          ← GET/POST/PATCH/DELETE /items
+│       ├── controllers/          ← Route handlers
+│       ├── services/             ← Business logic
+│       └── repositories/         ← SQLite queries
+│
 ├── frontend/
 │   └── src/
-│       ├── api/                       ← Axios client + item helpers
-│       ├── components/                ← ItemCard, SearchBar, Pagination…
-│       ├── pages/                     ← Dashboard, Login, Register
-│       ├── store/authStore.ts         ← Zustand auth state (critical path)
-│       └── types/index.ts             ← Shared TypeScript interfaces
+│       ├── api/                  ← Axios client + item API helpers (critical)
+│       ├── components/           ← ItemCard, SearchBar, Pagination…
+│       ├── pages/                ← Dashboard, Login, Register
+│       ├── store/
+│       │   └── authStore.ts      ← Zustand auth state (critical)
+│       └── types/index.ts        ← Shared TypeScript interfaces
+│
 ├── tests/
 │   ├── e2e/
-│   │   ├── pages/                     ← Page Object Model classes
-│   │   └── specs/                     ← Playwright spec files (61 tests)
-│   └── features/                      ← Gherkin .feature files
-├── scripts/                           ← Confluence push + update scripts (Python)
-├── .github/workflows/ci.yml           ← GitHub Actions: build + E2E
-├── CLAUDE.md                          ← CodeMie/Claude Code system context
-├── .env.example                       ← Environment variable template
-└── README.md                          ← This file
+│   │   ├── pages/                ← Page Object Model classes
+│   │   └── specs/                ← Playwright spec files
+│   ├── features/                 ← Gherkin .feature files
+│   └── playwright.config.ts
+│
+├── scripts/                      ← Python Confluence push/update scripts
+├── .github/workflows/ci.yml      ← GitHub Actions: build + test
+├── CLAUDE.md                     ← CodeMie system context
+├── AGENTS.md                     ← Agent operational notes
+├── .env.example                  ← Environment template
+└── README.md                     ← This file
 ```
 
 ---
@@ -364,10 +492,10 @@ All endpoints prefixed `/api`. Protected routes require `Authorization: Bearer <
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| POST | `/auth/register` | No | Register new user |
-| POST | `/auth/login` | No | Login, returns JWT + email |
-| GET | `/items` | Yes | List items (`?page&limit&search&status`) |
-| POST | `/items` | Yes | Create item |
+| POST | `/auth/register` | No | Register — `{ email, password, name }` |
+| POST | `/auth/login` | No | Login — returns `{ token, email }` |
+| GET | `/items` | Yes | List items — `?page&limit&search&status` |
+| POST | `/items` | Yes | Create item — `{ title, description?, status?, priority? }` |
 | PATCH | `/items/:id` | Yes | Update item (owner only) |
 | DELETE | `/items/:id` | Yes | Delete item (owner only) |
 | GET | `/health` | No | Health check |
@@ -376,56 +504,83 @@ All responses: `{ success: boolean, data?: T, error?: string }`
 
 ---
 
-## Live Links
+## Environment Variables
+
+```bash
+cp .env.example .env
+```
+
+| Variable | Default | Required | Description |
+|----------|---------|----------|-------------|
+| `BACKEND_PORT` | `4000` | No | Express server port |
+| `FRONTEND_PORT` | `3000` | No | Vite dev server port |
+| `DATABASE_PATH` | `./data/capstone.db` | No | SQLite file location |
+| `JWT_SECRET` | — | **Yes** | Token signing secret (min 32 chars) |
+| `JIRA_BASE_URL` | `https://jiraeu.epam.com` | Yes (agents) | Jira instance URL |
+| `JIRA_API_TOKEN` | — | Yes (agents) | EPAM Jira Personal Access Token |
+| `CONFLUENCE_BASE_URL` | `https://kb.epam.com` | Yes (agents) | Confluence instance URL |
+| `CONFLUENCE_API_TOKEN` | — | Yes (agents) | EPAM Confluence Personal Access Token |
+| `CONFLUENCE_SPACE_KEY` | — | Yes (agents) | Your Confluence space key |
+| `GITHUB_TOKEN` | — | Yes (agents) | GitHub PAT with `repo` scope |
+
+---
+
+## Testing
+
+| Suite | Tool | Location | Tests |
+|-------|------|----------|-------|
+| E2E — Auth flow | Playwright | `tests/e2e/specs/login.spec.ts` | 22 |
+| E2E — Dashboard | Playwright | `tests/e2e/specs/dashboard.spec.ts` | 25 |
+| E2E — Items CRUD | Playwright | `tests/e2e/specs/items.spec.ts` | 14 |
+| Unit — Frontend | Vitest | `frontend/src/__tests__/` | varies |
+| Unit — Backend | Vitest | `backend/src/__tests__/` | varies |
+
+```bash
+# E2E tests
+cd tests && npx playwright test
+cd tests && npx playwright show-report       # HTML report
+
+# Unit tests
+cd frontend && npx vitest run --coverage
+cd backend && npx vitest run --coverage
+```
+
+---
+
+## Integrations
+
+| Service | Purpose | Environment Variable |
+|---------|---------|---------------------|
+| Jira (EPMCDMETST) | Story creation, tracking | `JIRA_BASE_URL`, `JIRA_API_TOKEN` |
+| Confluence | Architecture, FRD, test reports | `CONFLUENCE_BASE_URL`, `CONFLUENCE_API_TOKEN`, `CONFLUENCE_SPACE_KEY` |
+| GitHub | Code hosting, PRs, CI/CD | `GITHUB_TOKEN` |
+| CodeMie | Agent orchestration, AI platform | Workspace ID in `.vscode/settings.json` |
+
+### Live Links
 
 | Resource | URL |
 |----------|-----|
 | GitHub Repository | https://github.com/KaladiSanthoshKumarReddy/capstone |
 | Jira Epic | https://jiraeu.epam.com/browse/EPMCDMETST-55183 |
 | Confluence Home | https://kb.epam.com/pages/viewpage.action?pageId=2889552361 |
-| Architecture Doc | https://kb.epam.com/pages/viewpage.action?pageId=2889554110 |
-| HLD | https://kb.epam.com/pages/viewpage.action?pageId=2889554152 |
-| FRD | https://kb.epam.com/pages/viewpage.action?pageId=2889556181 |
-| API Reference | https://kb.epam.com/pages/viewpage.action?pageId=2889556182 |
-| Test Execution Report | https://kb.epam.com/pages/viewpage.action?pageId=2889556184 |
-| Deployment Guide | https://kb.epam.com/pages/viewpage.action?pageId=2889556185 |
-
----
-
-## Testing
-
-| Spec | Tests | Coverage Area |
-|------|-------|---------------|
-| `login.spec.ts` | 22 | Login UI, validation, auth, route guards |
-| `dashboard.spec.ts` | 25 | Auth guard, layout, logout, item interactions |
-| `items.spec.ts` | 14 | Item CRUD, search + filter, pagination |
-| **Total** | **61** | Full E2E coverage |
-
----
-
-## Jira Stories
-
-| Story | Title | Status |
-|-------|-------|--------|
-| [EPMCDMETST-55183](https://jiraeu.epam.com/browse/EPMCDMETST-55183) | [Epic] AI-Driven SDLC Enhancements | Open |
-| [EPMCDMETST-55184](https://jiraeu.epam.com/browse/EPMCDMETST-55184) | Item Management Dashboard UI | Resolved |
-| [EPMCDMETST-55185](https://jiraeu.epam.com/browse/EPMCDMETST-55185) | JWT Auth Guard and Protected Routes | Resolved |
-| [EPMCDMETST-55186](https://jiraeu.epam.com/browse/EPMCDMETST-55186) | Item Search and Status Filter | Resolved |
-| [EPMCDMETST-55187](https://jiraeu.epam.com/browse/EPMCDMETST-55187) | Item Status Update — Complete CRUD | Resolved |
-| [EPMCDMETST-55188](https://jiraeu.epam.com/browse/EPMCDMETST-55188) | Pagination for Items List | Resolved |
 
 ---
 
 ## Contributing
 
 ```bash
-git checkout -b feature/EPMCDMETST-XXXXX-short-desc
-# make changes
+# Create a feature branch
+git checkout -b feature/EPMCDMETST-XXXXX-short-description
+
+# Commit convention
 git commit -m "feat(scope): description [EPMCDMETST-XXXXX]"
-git push origin feature/EPMCDMETST-XXXXX-short-desc
+
+# Push and open a PR
+git push origin feature/EPMCDMETST-XXXXX-short-description
+gh pr create --title "feat: description" --body "Closes EPMCDMETST-XXXXX"
 ```
 
-Commit convention: `feat|fix|test|docs|chore(scope): short description`
+Commit types: `feat` | `fix` | `test` | `docs` | `refactor` | `chore`
 
 ---
 
@@ -433,13 +588,14 @@ Commit convention: `feat|fix|test|docs|chore(scope): short description`
 
 | Problem | Fix |
 |---------|-----|
-| Agents not showing in CodeMie | Ensure CodeMie extension is installed + signed in; reload VS Code window |
-| Agent says "can't read .env" | Run `cp .env.example .env` and fill in tokens |
-| Backend fails to start | Check `DATABASE_PATH` folder exists; run `mkdir -p data` |
-| Playwright tests fail | Ensure both `npm run dev` processes are running on ports 3000 + 4000 |
-| Jira API 401 | Check `JIRA_API_TOKEN` is a PAT (not a password) |
-| Confluence API 403 | Verify `CONFLUENCE_SPACE_KEY` matches your space |
+| Agents not showing in CodeMie | Ensure CodeMie extension is installed and signed in; reload VS Code (`Cmd+Shift+P` → `Reload Window`) |
+| Agent says "can't read .env" | Run `cp .env.example .env` and fill in all required tokens |
+| Backend fails to start | Check `DATABASE_PATH` directory exists: `mkdir -p data` |
+| Playwright tests fail | Ensure both dev servers are running on ports 3000 and 4000 |
+| Jira API 401 | `JIRA_API_TOKEN` must be a PAT, not a password |
+| Confluence API 403 | Verify `CONFLUENCE_SPACE_KEY` matches your space (case-sensitive) |
+| TypeScript build errors | Run `cd frontend && npm run build` and `cd backend && npx tsc --noEmit` to see errors |
 
 ---
 
-*Generated with CodeMie — EPAM's AI development platform*
+*Powered by [CodeMie](https://codemie.epam.com) — EPAM's enterprise AI development platform*
