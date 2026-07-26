@@ -14,5 +14,79 @@
       "opusModel": "claude-opus-4-8",
       "name": "New_CodeMie_Capstone"
     }
-  }
+  },
+  "codemieAssistants": [
+    {
+      "id": "2ca3696a-110a-408e-8b3d-c3738429b320",
+      "name": "Solution Architect Agent-codemie",
+      "slug": "solution-architect-agent-codemie",
+      "description": "A solution architecture review assistant that evaluates system design decisions and provides pragmatic, incremental recommendations to improve scalability, resilience, reliability, and maintainability. It assesses how well the current architecture fits a requested change, surfaces technical debt and scaling risks, compares viable alternatives with explicit trade-offs, and proposes phased, low-risk improvement plans aligned to the existing technology stack and delivery timelines.",
+      "project": "santhoshkumarreddy_kaladi@epam.com",
+      "registeredAt": "2026-07-26T08:06:52.574Z",
+      "registrationMode": "agent",
+      "agentTargets": [
+        "claude"
+      ]
+    },
+    {
+      "id": "0a4f1a08-d025-44c4-a647-96173077b60d",
+      "name": "QA Agent-codemie",
+      "slug": "qa-agent-codemie",
+      "description": "A QA automation assistant focused on designing reliable end-to-end test coverage for user flows. It converts requirements into testable cases, authors comprehensive Gherkin scenario sets (happy path, negative path, and edge cases), and implements Playwright E2E tests that emphasize stable selectors, deterministic waiting strategies, and maintainable structure. It reuses existing page-object models and shared test utilities, validates assertions for behavior, state transitions, and URL/query synchronization where applicable, and highlights risks, gaps, and potential sources of flakiness with practical mitigation guidance.",
+      "project": "santhoshkumarreddy_kaladi@epam.com",
+      "registeredAt": "2026-07-26T08:06:52.577Z",
+      "registrationMode": "agent",
+      "agentTargets": [
+        "claude"
+      ]
+    },
+    {
+      "id": "49ef96e9-44b5-4810-bcd6-44b0af5f282e",
+      "name": "Dev Agent-codemie",
+      "slug": "dev-agent-codemie",
+      "description": "A repository-focused development assistant that implements requested features end-to-end across frontend, backend, and database layers using clean, minimal, production-safe diffs. It confirms requirements and acceptance criteria, identifies impacted modules/files, applies changes following existing project patterns, maintains strict TypeScript quality and API contract consistency, updates validation/types/error handling, aligns and updates automated tests for changed behavior, and provides a clear summary of changes and verification results.",
+      "project": "santhoshkumarreddy_kaladi@epam.com",
+      "registeredAt": "2026-07-26T08:06:52.579Z",
+      "registrationMode": "agent",
+      "agentTargets": [
+        "claude"
+      ]
+    },
+    {
+      "id": "359f1843-880b-4b00-bd5b-951c964efdc7",
+      "name": "Docs Agent-codemie",
+      "slug": "docs-agent-codemie",
+      "description": "A documentation assistant that keeps README files, Functional Requirements Documents (FRDs), and technical documentation accurate, clear, and aligned with the current implementation and SDLC process. It identifies which documentation sections are impacted by recent changes, updates functional behavior, setup and configuration notes, API usage guidance, constraints and limitations, and ensures consistency between docs and code. It also adds concise, practical examples when helpful while avoiding any claims about unimplemented behavior.",
+      "project": "santhoshkumarreddy_kaladi@epam.com",
+      "registeredAt": "2026-07-26T08:06:52.582Z",
+      "registrationMode": "agent",
+      "agentTargets": [
+        "claude"
+      ]
+    },
+    {
+      "id": "d54ba127-56a0-4c8e-9dbe-a8e6c4a89001",
+      "name": "Business Analyst Assistant-Codemie",
+      "slug": "business-analyst-assistant-codemie",
+      "description": "A project-specific Business Analyst (BA) assistant that converts feature ideas and stakeholder inputs into high-quality, Jira-ready user stories and Confluence-ready business documentation. It structures requirements into clear scope, preconditions, scenarios (Given/When/Then), and testable acceptance criteria, while explicitly documenting assumptions, dependencies, risks, and open questions. It can also draft artifacts suitable for publishing to the project’s Jira project (key: EPMCDMETST) and Confluence space (key: 2889552361, or CONFLUENCE_SPACE_KEY if provided), aligning outputs to business readability and traceability.",
+      "project": "santhoshkumarreddy_kaladi@epam.com",
+      "registeredAt": "2026-07-26T08:06:52.585Z",
+      "registrationMode": "agent",
+      "agentTargets": [
+        "claude"
+      ]
+    },
+    {
+      "id": "91dc79dd-08eb-4a88-ae19-b9cfc25bcc8f",
+      "name": "Code Review Agent-codemie",
+      "slug": "code-review-agent-codemie",
+      "description": "A deep code quality and security review assistant focused on TypeScript correctness, runtime safety, and maintainability. It analyzes changed code to identify type-safety issues, potential runtime failures, authentication/authorization weaknesses, input validation gaps, insecure data-handling patterns, and common security vulnerabilities. It also flags anti-patterns, duplication, and unclear logic, then proposes minimal, concrete fixes aligned with the existing codebase style, along with a verification checklist to confirm the improvements.",
+      "project": "santhoshkumarreddy_kaladi@epam.com",
+      "registeredAt": "2026-07-26T08:06:52.587Z",
+      "registrationMode": "agent",
+      "agentTargets": [
+        "claude"
+      ]
+    }
+  ]
 }
