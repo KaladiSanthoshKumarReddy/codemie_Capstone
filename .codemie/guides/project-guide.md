@@ -74,4 +74,4 @@ backend/src/
 ## Integrations
 - Jira project key: EPMCDMETST
 - Confluence space: configured in `.env` via CONFLUENCE_SPACE_KEY
-- GitHub repo: https://github.com/KaladiSanthoshKumarReddy/capstone
+- GitHub repo: https://github.com/KaladiSanthoshKumarReddy/codemie_Capstone

@@ -21,7 +21,7 @@ CodeMie is EPAM's AI development platform that runs Claude Code in a governed, e
 ## Integrations
 - Jira:       https://jiraeu.epam.com  (env: JIRA_BASE_URL, JIRA_API_TOKEN)
 - Confluence: https://kb.epam.com      (env: CONFLUENCE_BASE_URL, CONFLUENCE_API_TOKEN)
-- Git:        https://github.com/KaladiSanthoshKumarReddy/capstone (branch: main)
+- Git:        https://github.com/KaladiSanthoshKumarReddy/codemie_Capstone (branch: main)
 - CodeMie:    workspace bound via `.vscode/settings.json`
 
 ## Agents (in .claude/agents/)

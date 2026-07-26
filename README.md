@@ -85,7 +85,7 @@ Build an **agentic SDLC pipeline** where every phase is powered by a dedicated A
 ### 1 — Clone and install
 
 ```bash
-git clone https://github.com/KaladiSanthoshKumarReddy/capstone.git capstone-codemie
+git clone https://github.com/KaladiSanthoshKumarReddy/codemie_Capstone.git capstone-codemie
 cd capstone-codemie
 npm run install:all
 ```
@@ -308,7 +308,7 @@ Code committed to branch: feature/EPMCDMETST-55189-item-priority
 Commit: feat(items): add priority field with badge UI [EPMCDMETST-55189]
 
 ✋ Human Review Required: Please review the diff at:
-   https://github.com/KaladiSanthoshKumarReddy/capstone/compare/feature/EPMCDMETST-55189-item-priority
+   https://github.com/KaladiSanthoshKumarReddy/codemie_Capstone/compare/feature/EPMCDMETST-55189-item-priority
    before I open a PR.
 ```
 
@@ -560,7 +560,7 @@ cd backend && npx vitest run --coverage
 
 | Resource | URL |
 |----------|-----|
-| GitHub Repository | https://github.com/KaladiSanthoshKumarReddy/capstone |
+| GitHub Repository | https://github.com/KaladiSanthoshKumarReddy/codemie_Capstone |
 | Jira Epic | https://jiraeu.epam.com/browse/EPMCDMETST-55183 |
 | Confluence Home | https://kb.epam.com/pages/viewpage.action?pageId=2889552361 |
 
