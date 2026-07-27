@@ -28,19 +28,26 @@ export async function initDb() {
       title       TEXT NOT NULL,
       description TEXT,
       status      TEXT DEFAULT 'active',
+      priority    TEXT DEFAULT 'medium',
       user_id     INTEGER REFERENCES users(id),
       created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at  DATETIME
     );
   `)
 
-  // Migration: add updated_at if it was missing from the original schema
+  // Migrations: add columns if missing from the original schema
   const cols = await db.execute("PRAGMA table_info(items)")
   const hasUpdatedAt = cols.rows.some((r: unknown) => (r as { name: string }).name === 'updated_at')
   if (!hasUpdatedAt) {
     await db.execute("ALTER TABLE items ADD COLUMN updated_at DATETIME")
-    console.log('Migration: added updated_at column to items')
+    // Migration: added updated_at column to items
   }
 
-  console.log('Database initialized')
+  const hasPriority = cols.rows.some((r: unknown) => (r as { name: string }).name === 'priority')
+  if (!hasPriority) {
+    await db.execute("ALTER TABLE items ADD COLUMN priority TEXT DEFAULT 'medium'")
+    // Migration: added priority column to items
+  }
+
+  // Database initialized
 }

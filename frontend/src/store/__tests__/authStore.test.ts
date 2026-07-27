@@ -1,5 +1,12 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+// Use vitest global APIs (configured via vitest.config.ts -> test.globals)
+const { describe, it, expect, beforeEach } = globalThis as any
+
 import { useAuthStore } from '../authStore'
+
+// Vitest can throw "failed to find the runner" in certain monorepo/CWD setups.
+// Using the global test APIs avoids importing the runner module directly.
 
 const TOKEN_KEY = 'capstone_token'
 const EMAIL_KEY = 'capstone_email'

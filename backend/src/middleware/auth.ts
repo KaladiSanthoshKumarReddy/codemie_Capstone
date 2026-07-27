@@ -9,10 +9,12 @@ export interface AuthRequest extends Request {
 }
 
 export function authMiddleware(req: AuthRequest, res: Response, next: NextFunction) {
+
   const authHeader = req.headers.authorization
   if (!authHeader?.startsWith('Bearer ')) {
     return res.status(401).json({ success: false, error: 'Missing or invalid Authorization header' })
   }
+
   const token = authHeader.slice(7)
   try {
     const payload = jwt.verify(token, JWT_SECRET) as { userId: number; email: string }
