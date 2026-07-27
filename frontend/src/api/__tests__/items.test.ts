@@ -1,18 +1,27 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { createItem, updateItem, deleteItem } from '../items'
 
-// Mock the axios client — must be declared before importing the functions under test.
-// vitest hoists vi.mock calls above imports automatically.
+// vi.mock is hoisted above imports, so mock functions must be created with
+// vi.hoisted() to ensure they exist when the factory runs.
+const { getMock, postMock, patchMock, deleteMock } = vi.hoisted(() => ({
+  getMock: vi.fn(),
+  postMock: vi.fn(),
+  patchMock: vi.fn(),
+  deleteMock: vi.fn(),
+}))
+
 vi.mock('../client', () => ({
   default: {
-    get:    vi.fn(),
-    post:   vi.fn(),
-    patch:  vi.fn(),
-    delete: vi.fn(),
+    get: getMock,
+    post: postMock,
+    patch: patchMock,
+    delete: deleteMock,
   },
 }))
 
+// Import after mocking the axios client.
 import client from '../client'
+import { createItem, updateItem, deleteItem } from '../items'
+
 
 // ---------------------------------------------------------------------------
 // createItem
@@ -21,7 +30,7 @@ describe('createItem', () => {
   beforeEach(() => { vi.clearAllMocks() })
 
   it('posts to /items with title and description and returns the new id', async () => {
-    vi.mocked(client.post).mockResolvedValueOnce({
+    postMock.mockResolvedValueOnce({
       data: { success: true, data: { id: 42 } },
     })
 
@@ -36,7 +45,7 @@ describe('createItem', () => {
   })
 
   it('posts without description when omitted', async () => {
-    vi.mocked(client.post).mockResolvedValueOnce({
+    postMock.mockResolvedValueOnce({
       data: { success: true, data: { id: 1 } },
     })
 
@@ -50,7 +59,7 @@ describe('createItem', () => {
   })
 
   it('rejects when the request fails', async () => {
-    vi.mocked(client.post).mockRejectedValueOnce(new Error('Network error'))
+    postMock.mockRejectedValueOnce(new Error('Network error'))
 
     await expect(createItem('Failing item')).rejects.toThrow('Network error')
   })
@@ -69,7 +78,7 @@ describe('updateItem', () => {
       description: null, user_id: 1,
       created_at: '2024-01-01', updated_at: '2024-01-02',
     }
-    vi.mocked(client.patch).mockResolvedValueOnce({
+    patchMock.mockResolvedValueOnce({
       data: { success: true, data: mockItem },
     })
 
@@ -86,7 +95,7 @@ describe('updateItem', () => {
       description: null, user_id: 1,
       created_at: '2024-01-01', updated_at: '2024-01-02',
     }
-    vi.mocked(client.patch).mockResolvedValueOnce({
+    patchMock.mockResolvedValueOnce({
       data: { success: true, data: mockItem },
     })
 
@@ -103,7 +112,7 @@ describe('updateItem', () => {
       description: null, user_id: 1,
       created_at: '2024-01-01', updated_at: '2024-01-03',
     }
-    vi.mocked(client.patch).mockResolvedValueOnce({
+    patchMock.mockResolvedValueOnce({
       data: { success: true, data: mockItem },
     })
 
@@ -114,7 +123,7 @@ describe('updateItem', () => {
   })
 
   it('rejects when the request fails', async () => {
-    vi.mocked(client.patch).mockRejectedValueOnce(new Error('Server error'))
+    patchMock.mockRejectedValueOnce(new Error('Server error'))
 
     await expect(updateItem(1, { status: 'active' })).rejects.toThrow('Server error')
   })
@@ -127,7 +136,7 @@ describe('deleteItem', () => {
   beforeEach(() => { vi.clearAllMocks() })
 
   it('calls DELETE /items/:id', async () => {
-    vi.mocked(client.delete).mockResolvedValueOnce({ data: { success: true } })
+    deleteMock.mockResolvedValueOnce({ data: { success: true } })
 
     await deleteItem(7)
 
@@ -135,7 +144,7 @@ describe('deleteItem', () => {
   })
 
   it('resolves to undefined on success', async () => {
-    vi.mocked(client.delete).mockResolvedValueOnce({ data: { success: true } })
+    deleteMock.mockResolvedValueOnce({ data: { success: true } })
 
     const result = await deleteItem(10)
 
@@ -143,7 +152,7 @@ describe('deleteItem', () => {
   })
 
   it('rejects when the request fails', async () => {
-    vi.mocked(client.delete).mockRejectedValueOnce(new Error('Not found'))
+    deleteMock.mockRejectedValueOnce(new Error('Not found'))
 
     await expect(deleteItem(99)).rejects.toThrow('Not found')
   })
