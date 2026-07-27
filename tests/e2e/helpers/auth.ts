@@ -35,3 +35,27 @@ export async function clearAuth(page: Page) {
     { tokenKey: TOKEN_KEY, emailKey: EMAIL_KEY },
   )
 }
+
+// ---------------------------------------------------------------------------
+// E2E cleanup helpers — call from afterAll hooks to remove test data
+// ---------------------------------------------------------------------------
+const DEBUG_BASE = 'http://localhost:4000'
+
+/** Delete one test user (and all their items) by exact email address. */
+export async function deleteUserByEmail(
+  request: import('@playwright/test').APIRequestContext,
+  email: string,
+): Promise<void> {
+  await request.delete(`${DEBUG_BASE}/api/debug/users/${encodeURIComponent(email)}`)
+}
+
+/**
+ * Bulk-delete all test users whose email matches a SQL LIKE pattern plus their items.
+ * Use a narrow pattern (e.g. 'register_e2e_%@capstone.dev') to avoid touching other suites.
+ */
+export async function cleanupTestUsersByPattern(
+  request: import('@playwright/test').APIRequestContext,
+  like: string,
+): Promise<void> {
+  await request.delete(`${DEBUG_BASE}/api/debug/cleanup`, { data: { like } })
+}

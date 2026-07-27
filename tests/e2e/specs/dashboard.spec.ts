@@ -12,6 +12,7 @@ async function authenticate(page: Parameters<typeof loginViaApi>[0]) {
   await loginViaApi(page, USER.email, USER.password)
 }
 
+
 // ---------------------------------------------------------------------------
 // Auth guard — no login required
 // ---------------------------------------------------------------------------

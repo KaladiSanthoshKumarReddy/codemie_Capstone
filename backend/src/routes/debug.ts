@@ -279,4 +279,40 @@ router.get('/items', async (_req: Request, res: Response) => {
   return res.json({ success: true, data: result.rows })
 })
 
+// E2E test cleanup: delete a single user and all their items by email.
+// Only reachable in non-production (guarded at mount point in index.ts).
+router.delete('/users/:email', async (req: Request, res: Response) => {
+  const email = decodeURIComponent(req.params.email)
+  const db = getDb()
+  await db.execute({
+    sql: 'DELETE FROM items WHERE user_id = (SELECT id FROM users WHERE email = ?)',
+    args: [email],
+  })
+  const result = await db.execute({
+    sql: 'DELETE FROM users WHERE email = ?',
+    args: [email],
+  })
+  const deleted = (result.rowsAffected ?? 0) > 0
+  return res.json({ success: true, deleted, email })
+})
+
+// E2E test cleanup: bulk-delete all users whose email matches a SQL LIKE pattern
+// plus all of their items. Default pattern is '%@capstone.dev'.
+// Pass { "like": "register_e2e_%@capstone.dev" } in the request body to narrow scope.
+router.delete('/cleanup', async (req: Request, res: Response) => {
+  const like: string = (req.body && typeof req.body.like === 'string')
+    ? req.body.like
+    : '%@capstone.dev'
+  const db = getDb()
+  await db.execute({
+    sql: 'DELETE FROM items WHERE user_id IN (SELECT id FROM users WHERE email LIKE ?)',
+    args: [like],
+  })
+  const result = await db.execute({
+    sql: 'DELETE FROM users WHERE email LIKE ?',
+    args: [like],
+  })
+  return res.json({ success: true, deleted: result.rowsAffected ?? 0, like })
+})
+
 export default router
