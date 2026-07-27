@@ -4,13 +4,19 @@ import type { Item } from '../types'
 interface Props {
   item: Item
   onDelete: (id: number) => Promise<void>
-  onUpdate: (id: number, patch: Partial<Pick<Item, 'title' | 'status'>>) => Promise<void>
+  onUpdate: (id: number, patch: Partial<Pick<Item, 'title' | 'status' | 'priority'>>) => Promise<void>
 }
 
 const STATUS_COLORS: Record<Item['status'], string> = {
   active:    'bg-blue-100 text-blue-700',
   completed: 'bg-green-100 text-green-700',
   archived:  'bg-gray-100 text-gray-500',
+}
+
+const PRIORITY_COLORS: Record<Item['priority'], string> = {
+  high: 'bg-red-100 text-red-700',
+  medium: 'bg-yellow-100 text-yellow-800',
+  low: 'bg-gray-100 text-gray-600',
 }
 
 export default function ItemCard({ item, onDelete, onUpdate }: Props) {
@@ -110,11 +116,37 @@ export default function ItemCard({ item, onDelete, onUpdate }: Props) {
         </p>
       </div>
 
-      {/* Status badge */}
-      <span className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${STATUS_COLORS[item.status]}`}
-        data-testid={`item-status-${item.id}`}>
-        {item.status}
-      </span>
+      {/* Priority badge + inline selector */}
+      <div className="flex flex-col items-end gap-2 shrink-0">
+        <span
+          className={`text-xs px-2 py-0.5 rounded-full font-medium ${PRIORITY_COLORS[item.priority]}`}
+          data-testid={`item-priority-${item.id}`}
+          title="Priority"
+        >
+          {item.priority}
+        </span>
+
+        <select
+          value={item.priority}
+          onChange={e => onUpdate(item.id, { priority: e.target.value as Item['priority'] })}
+          disabled={busy}
+          className="border rounded px-2 py-1 text-xs bg-white"
+          data-testid={`item-priority-select-${item.id}`}
+          aria-label="Change priority"
+        >
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
+        </select>
+
+        {/* Status badge */}
+        <span
+          className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_COLORS[item.status]}`}
+          data-testid={`item-status-${item.id}`}
+        >
+          {item.status}
+        </span>
+      </div>
 
       {/* Archive button — only for non-archived items */}
       {item.status !== 'archived' && (

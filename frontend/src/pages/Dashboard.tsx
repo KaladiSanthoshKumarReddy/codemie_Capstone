@@ -5,9 +5,11 @@ import ItemForm from '../components/ItemForm'
 import ItemList from '../components/ItemList'
 import SearchBar from '../components/SearchBar'
 import StatusFilter from '../components/StatusFilter'
+import PriorityFilter from '../components/PriorityFilter'
+import SortSelect from '../components/SortSelect'
 import Pagination from '../components/Pagination'
 import { fetchItems, createItem, updateItem, deleteItem } from '../api/items'
-import type { Item, PaginationMeta, ItemStatus } from '../types'
+import type { Item, PaginationMeta, ItemStatus, ItemPriority } from '../types'
 
 const LIMIT = 10
 
@@ -21,6 +23,8 @@ export default function Dashboard() {
 
   const search = searchParams.get('search') ?? ''
   const status = (searchParams.get('status') ?? 'all') as ItemStatus
+  const priority = (searchParams.get('priority') ?? 'all') as ItemPriority | 'all'
+  const sort = searchParams.get('sort') ?? 'created_at'
   const page   = parseInt(searchParams.get('page') ?? '1')
 
   function updateParams(patch: Record<string, string>) {
@@ -46,6 +50,8 @@ export default function Dashboard() {
         limit: LIMIT,
         search: search || undefined,
         status: status !== 'all' ? status : undefined,
+        priority: priority !== 'all' ? priority : undefined,
+        sort: sort !== 'created_at' ? sort : undefined,
       })
       setItems(res.data as unknown as Item[])
       setMeta(res.meta)
@@ -54,12 +60,12 @@ export default function Dashboard() {
     } finally {
       setLoading(false)
     }
-  }, [page, search, status])
+  }, [page, search, status, priority, sort])
 
   useEffect(() => { loadItems() }, [loadItems])
 
-  async function handleAdd(title: string, description: string) {
-    await createItem(title, description || undefined)
+  async function handleAdd(title: string, description: string, itemPriority: ItemPriority) {
+    await createItem(title, description || undefined, itemPriority)
     updateParams({ page: '1' })
     await loadItems()
   }
@@ -69,7 +75,7 @@ export default function Dashboard() {
     await loadItems()
   }
 
-  async function handleUpdate(id: number, patch: Partial<Pick<Item, 'title' | 'status'>>) {
+  async function handleUpdate(id: number, patch: Partial<Pick<Item, 'title' | 'status' | 'priority'>>) {
     await updateItem(id, patch)
     await loadItems()
   }
@@ -102,6 +108,14 @@ export default function Dashboard() {
           <StatusFilter
             value={status}
             onChange={v => updateParams({ status: v, page: '' })}
+          />
+          <PriorityFilter
+            value={priority}
+            onChange={v => updateParams({ priority: v, page: '' })}
+          />
+          <SortSelect
+            value={sort}
+            onChange={v => updateParams({ sort: v, page: '' })}
           />
         </div>
 

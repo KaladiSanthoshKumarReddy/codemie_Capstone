@@ -1,12 +1,15 @@
 import { useState } from 'react'
 
+import type { ItemPriority } from '../types'
+
 interface Props {
-  onAdd: (title: string, description: string) => Promise<void>
+  onAdd: (title: string, description: string, priority: ItemPriority) => Promise<void>
 }
 
 export default function ItemForm({ onAdd }: Props) {
   const [title, setTitle]       = useState('')
   const [desc, setDesc]         = useState('')
+  const [priority, setPriority] = useState<ItemPriority>('medium')
   const [loading, setLoading]   = useState(false)
   const [error, setError]       = useState('')
 
@@ -16,9 +19,10 @@ export default function ItemForm({ onAdd }: Props) {
     setLoading(true)
     setError('')
     try {
-      await onAdd(title.trim(), desc.trim())
+      await onAdd(title.trim(), desc.trim(), priority)
       setTitle('')
       setDesc('')
+      setPriority('medium')
     } catch {
       setError('Failed to add item.')
     } finally {
@@ -30,7 +34,7 @@ export default function ItemForm({ onAdd }: Props) {
     <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border p-4 mb-6 space-y-3">
       <h2 className="font-semibold text-gray-700">Add New Item</h2>
       {error && <p className="text-red-500 text-sm" data-testid="form-error">{error}</p>}
-      <div className="flex gap-2">
+      <div className="flex gap-2 flex-wrap">
         <input
           type="text"
           placeholder="Title *"
@@ -48,6 +52,18 @@ export default function ItemForm({ onAdd }: Props) {
           className="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
           data-testid="item-desc-input"
         />
+        <select
+          value={priority}
+          onChange={e => setPriority(e.target.value as ItemPriority)}
+          className="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+          data-testid="item-priority-select"
+          aria-label="Priority"
+        >
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
+        </select>
+
         <button
           type="submit"
           disabled={loading || !title.trim()}

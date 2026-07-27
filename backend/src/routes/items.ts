@@ -6,23 +6,29 @@ import { authMiddleware, AuthRequest } from '../middleware/auth'
 const router = Router()
 router.use(authMiddleware)
 
+const prioritySchema = z.enum(['high', 'medium', 'low'])
+
 const createSchema = z.object({
   title: z.string().min(1),
   description: z.string().optional(),
+  priority: prioritySchema.optional(),
 })
 
 const patchSchema = z.object({
   title: z.string().min(1).optional(),
   description: z.string().optional(),
   status: z.enum(['active', 'completed', 'archived']).optional(),
+  priority: prioritySchema.optional(),
 })
 
-// GET /api/items?page=1&limit=10&search=text&status=active
+// GET /api/items?page=1&limit=10&search=text&status=active&priority=high&sort=priority
 router.get('/', async (req: AuthRequest, res: Response) => {
   const page  = Math.max(1, parseInt(req.query.page  as string) || 1)
   const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 10))
   const search = (req.query.search as string | undefined)?.trim() || null
   const status = (req.query.status as string | undefined) || null
+  const priority = (req.query.priority as string | undefined) || null
+  const sort = (req.query.sort as string | undefined) || null
   const offset = (page - 1) * limit
 
   const db = getDb()
@@ -39,13 +45,26 @@ router.get('/', async (req: AuthRequest, res: Response) => {
     args.push(status)
   }
 
+  if (priority && priority !== 'all') {
+    const parsedPriority = prioritySchema.safeParse(priority)
+    if (!parsedPriority.success) {
+      return res.status(400).json({ success: false, error: 'Invalid priority filter' })
+    }
+    whereClauses.push('priority = ?')
+    args.push(parsedPriority.data)
+  }
+
   const where = whereClauses.length ? `WHERE ${whereClauses.join(' AND ')}` : ''
 
   const countResult = await db.execute({ sql: `SELECT COUNT(*) as total FROM items ${where}`, args })
   const total = Number((countResult.rows[0] as unknown as { total: number }).total)
 
+  const orderBy = sort === 'priority'
+    ? "ORDER BY CASE priority WHEN 'high' THEN 1 WHEN 'medium' THEN 2 WHEN 'low' THEN 3 ELSE 4 END, created_at DESC"
+    : 'ORDER BY created_at DESC'
+
   const itemsResult = await db.execute({
-    sql: `SELECT * FROM items ${where} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
+    sql: `SELECT * FROM items ${where} ${orderBy} LIMIT ? OFFSET ?`,
     args: [...args, limit, offset],
   })
 
@@ -62,11 +81,11 @@ router.post('/', async (req: AuthRequest, res: Response) => {
   if (!parsed.success) {
     return res.status(400).json({ success: false, error: 'Invalid input' })
   }
-  const { title, description } = parsed.data
+  const { title, description, priority } = parsed.data
   const db = getDb()
   const result = await db.execute({
-    sql: 'INSERT INTO items (title, description, user_id) VALUES (?, ?, ?)',
-    args: [title, description ?? null, req.userId ?? null],
+    sql: 'INSERT INTO items (title, description, priority, user_id) VALUES (?, ?, ?, ?)',
+    args: [title, description ?? null, priority ?? 'medium', req.userId ?? null],
   })
   return res.status(201).json({ success: true, data: { id: Number(result.lastInsertRowid) } })
 })
@@ -77,17 +96,18 @@ router.patch('/:id', async (req: AuthRequest, res: Response) => {
   if (!parsed.success) {
     return res.status(400).json({ success: false, error: 'Invalid input' })
   }
-  const { title, description, status } = parsed.data
-  if (!title && description === undefined && !status) {
+  const { title, description, status, priority } = parsed.data
+  if (!title && description === undefined && !status && !priority) {
     return res.status(400).json({ success: false, error: 'Nothing to update' })
   }
   const db = getDb()
 
   const setClauses: string[] = ['updated_at = CURRENT_TIMESTAMP']
   const args: (string | number | null)[] = []
-  if (title)                { setClauses.push('title = ?');       args.push(title) }
+  if (title)                     { setClauses.push('title = ?');       args.push(title) }
   if (description !== undefined) { setClauses.push('description = ?'); args.push(description) }
-  if (status)               { setClauses.push('status = ?');      args.push(status) }
+  if (status)                    { setClauses.push('status = ?');      args.push(status) }
+  if (priority)                  { setClauses.push('priority = ?');    args.push(priority) }
   args.push(req.params.id, req.userId ?? null)
 
   const result = await db.execute({
