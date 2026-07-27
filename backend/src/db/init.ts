@@ -40,14 +40,14 @@ export async function initDb() {
   const hasUpdatedAt = cols.rows.some((r: unknown) => (r as { name: string }).name === 'updated_at')
   if (!hasUpdatedAt) {
     await db.execute("ALTER TABLE items ADD COLUMN updated_at DATETIME")
-    console.log('Migration: added updated_at column to items')
+    // Migration: added updated_at column to items
   }
 
   const hasPriority = cols.rows.some((r: unknown) => (r as { name: string }).name === 'priority')
   if (!hasPriority) {
     await db.execute("ALTER TABLE items ADD COLUMN priority TEXT DEFAULT 'medium'")
-    console.log('Migration: added priority column to items')
+    // Migration: added priority column to items
   }
 
-  console.log('Database initialized')
+  // Database initialized
 }

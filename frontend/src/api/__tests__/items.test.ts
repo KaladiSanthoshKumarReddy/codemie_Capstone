@@ -30,6 +30,7 @@ describe('createItem', () => {
     expect(client.post).toHaveBeenCalledWith('/items', {
       title: 'Test title',
       description: 'Test description',
+      priority: undefined,
     })
     expect(result).toEqual({ id: 42 })
   })
@@ -44,6 +45,7 @@ describe('createItem', () => {
     expect(client.post).toHaveBeenCalledWith('/items', {
       title: 'Title only',
       description: undefined,
+      priority: undefined,
     })
   })
 
@@ -63,6 +65,7 @@ describe('updateItem', () => {
   it('patches /items/:id with a status patch and returns the updated item', async () => {
     const mockItem = {
       id: 5, title: 'My item', status: 'completed' as const,
+      priority: 'medium' as const,
       description: null, user_id: 1,
       created_at: '2024-01-01', updated_at: '2024-01-02',
     }
@@ -79,6 +82,7 @@ describe('updateItem', () => {
   it('patches /items/:id with a title patch', async () => {
     const mockItem = {
       id: 3, title: 'New Title', status: 'active' as const,
+      priority: 'low' as const,
       description: null, user_id: 1,
       created_at: '2024-01-01', updated_at: '2024-01-02',
     }
@@ -95,6 +99,7 @@ describe('updateItem', () => {
   it('patches /items/:id with an archived status', async () => {
     const mockItem = {
       id: 7, title: 'Old item', status: 'archived' as const,
+      priority: 'high' as const,
       description: null, user_id: 1,
       created_at: '2024-01-01', updated_at: '2024-01-03',
     }

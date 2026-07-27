@@ -116,7 +116,8 @@ test.describe('Search and Filter', () => {
   test('should filter items by search term', async ({ page }) => {
     const search = page.getByTestId('search-input')
     await search.fill('unique search xyz')
-    await page.waitForTimeout(400) // wait for debounce
+    // wait for debounce by waiting on URL update
+
     // Result: empty-state or filtered list — URL should have search param
     await expect(page).toHaveURL(/search=unique/)
   })
@@ -130,7 +131,7 @@ test.describe('Search and Filter', () => {
   test('should reset page to 1 when search changes', async ({ page }) => {
     const search = page.getByTestId('search-input')
     await search.fill('test')
-    await page.waitForTimeout(400)
+    await expect(page).toHaveURL(/search=test/)
     const url = new URL(page.url())
     // page param should be absent or 1
     const pageParam = url.searchParams.get('page')
