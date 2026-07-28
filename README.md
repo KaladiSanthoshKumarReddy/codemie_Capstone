@@ -494,8 +494,8 @@ All endpoints prefixed `/api`. Protected routes require `Authorization: Bearer <
 |--------|----------|------|-------------|
 | POST | `/auth/register` | No | Register — `{ email, password, name }` |
 | POST | `/auth/login` | No | Login — returns `{ token, email }` |
-| GET | `/items` | Yes | List items — `?page&limit&search&status` |
-| POST | `/items` | Yes | Create item — `{ title, description?, status?, priority? }` |
+| GET | `/items` | Yes | List items — `?page&limit&search&status&priority&sort` |
+| POST | `/items` | Yes | Create item — `{ title, description?, priority? }` |
 | PATCH | `/items/:id` | Yes | Update item (owner only) |
 | DELETE | `/items/:id` | Yes | Delete item (owner only) |
 | GET | `/health` | No | Health check |
