@@ -16,6 +16,12 @@ Follow linked docs instead of duplicating them in responses.
 - E2E tests: `tests/e2e`
 - Gherkin features: `tests/features`
 
+## Custom Skills
+- `release-readiness-gate`: Final GO/NO-GO gate for story batches using build, unit, E2E, and review evidence.
+- `jira-confluence-traceability-sync`: Maintains story to design to code to test traceability across Jira and Confluence.
+
+Skill files live under `.claude/skills/`.
+
 ## Verified Commands
 Run from repo root unless otherwise noted.
 
