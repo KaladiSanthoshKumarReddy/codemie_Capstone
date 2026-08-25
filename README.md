@@ -1,5 +1,6 @@
 # Capstone-CodeMie — AI-Driven SDLC via CodeMie
 
+
 > **Group:** mm-learning-group-1 | **Jira Project:** EPMCDMETST | **Branch:** `main`
 
 A brownfield React + Node.js task-management app demonstrating a full AI-assisted SDLC pipeline powered by **CodeMie** (EPAM's enterprise AI platform). Six specialised agents — each embodying a SDLC persona — drive every phase from requirements to deployment, with **Human-in-the-Loop (HITL)** checkpoints at every gate.
